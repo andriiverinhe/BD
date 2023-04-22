@@ -1,0 +1,103 @@
+CREATE TABLE "public.Insurance_company" (
+	"agent_name" TEXT NOT NULL,
+	"agent_surname" TEXT NOT NULL,
+	"agent_lastname" TEXT NOT NULL,
+	"agent_date_of_birth" DATE NOT NULL,
+	"agent_expirience" int NOT NULL,
+	"policyholder_name" TEXT NOT NULL,
+	"policyholder_surname" TEXT NOT NULL,
+	"policyholder_lastname" TEXT NOT NULL,
+	"policyholder_sex" TEXT NOT NULL,
+	"policyholder_date_of_birth" DATE NOT NULL,
+	"policyholder_nationality" TEXT NOT NULL,
+	"insurance_type_event" TEXT NOT NULL,
+	"insurance_date" DATE NOT NULL,
+	"insurance_city" TEXT NOT NULL,
+	"insurance_name" TEXT NOT NULL,
+	"insurance_surname" TEXT NOT NULL,
+	"insurance_lastname" TEXT NOT NULL,
+	"policy_number" int NOT NULL,
+	"insurance_refund_amount" int NOT NULL,
+	"insurence_sum_premium" int NOT NULL,
+	"insurance_amount" int NOT NULL,
+	CONSTRAINT "Insurance_company_pk" PRIMARY KEY ("policy_number")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE "public.Agent" (
+	"agent_id" serial NOT NULL,
+	"name" TEXT NOT NULL,
+	"surname" TEXT NOT NULL,
+	"lastname" TEXT NOT NULL,
+	"date_of_birth" DATE NOT NULL,
+	"expirience_work" TEXT NOT NULL,
+	CONSTRAINT "Agent_pk" PRIMARY KEY ("agent_id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE "public.person" (
+	"policyholder_id" int NOT NULL,
+	"name" TEXT NOT NULL,
+	"surname" TEXT NOT NULL,
+	"lastname" TEXT NOT NULL,
+	"sex" TEXT NOT NULL,
+	"date_of_birth" DATE NOT NULL,
+	"nationality" TEXT NOT NULL,
+	CONSTRAINT "person_pk" PRIMARY KEY ("policyholder_id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE "public.Policy" (
+	"policy_id" int NOT NULL,
+	"policyholder" int NOT NULL,
+	"agent_id" int NOT NULL,
+	"insured_person_id" int NOT NULL,
+	"date" DATE NOT NULL,
+	"city" TEXT NOT NULL,
+	"bonus_amount" int NOT NULL,
+	"insurance_amount" int NOT NULL,
+	CONSTRAINT "Policy_pk" PRIMARY KEY ("policy_id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE "public.type_event" (
+	"type_event_id" int NOT NULL,
+	"type_event" TEXT NOT NULL,
+	CONSTRAINT "type_event_pk" PRIMARY KEY ("type_event_id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE "public.Policy_Event" (
+	"policy_event_id" serial NOT NULL,
+	"policy" int NOT NULL,
+	"type_event" int NOT NULL,
+	"refound_amount" int NOT NULL,
+	CONSTRAINT "Policy_Event_pk" PRIMARY KEY ("policy_event_id")
+) WITH (
+  OIDS=FALSE
+);
+
+ALTER TABLE "public.Policy" ADD CONSTRAINT "Policy_fk0" FOREIGN KEY ("policyholder") REFERENCES "public.person"("policyholder_id");
+ALTER TABLE "public.Policy" ADD CONSTRAINT "Policy_fk1" FOREIGN KEY ("agent_id") REFERENCES "public.Agent"("agent_id");
+ALTER TABLE "public.Policy" ADD CONSTRAINT "Policy_fk2" FOREIGN KEY ("insured_person_id") REFERENCES "public.person"("policyholder_id");
+
+ALTER TABLE "public.Policy_Event" ADD CONSTRAINT "Policy_Event_fk0" FOREIGN KEY ("policy") REFERENCES "public.Policy"("policy_id");
+ALTER TABLE "public.Policy_Event" ADD CONSTRAINT "Policy_Event_fk1" FOREIGN KEY ("type_event") REFERENCES "public.type_event"("type_event_id");
+
+SELECT "policy_id", "name" from "public.Policy","public.Agent" where "policy_id" = 3;
+
