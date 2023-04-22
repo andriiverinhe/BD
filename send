@@ -1,0 +1,59 @@
+--Простой запрос
+SELECT "name", "lastname"
+FROM "public.Agent";
+
+--Удаление дубликатов
+SELECT DISTINCT "name", "lastname"
+FROM "public.Agent";
+
+--All Cols
+SELECT *
+FROM "public.Agent";
+
+--All Cols and filter
+SELECT *
+FROM "public.Agent" agent
+WHERE agent.agent_id > 3;
+
+--Конкатенация (сцепление) строк. Псевдоним столбца
+SELECT
+"name" || ' ' || "date_of_birth" AS "result"
+FROM "public.Agent";
+
+--Сравнение строки с шаблоном
+SELECT "name"
+FROM "public.Agent" agent
+WHERE agent.name LIKE '%a';
+
+--Проверка на попадание в диапазон
+date_of_birth
+FROM "public.Agent" agent
+WHERE agent.date_of_birth BETWEEN
+'1990-01-01' AND '2000-01-01';
+
+--Проверка на попадание в список значений
+SELECT *
+FROM "public.Agent" agent;
+WHERE agent.agent_id IN (2,4);
+
+--Получение фиктивных значений
+SELECT 'one row' "name"
+
+--Получение ровно одного значения
+SELECT NOW();
+
+--Работа с неизвестными значениями
+SELECT 5 + NULL
+AS policyholder_id
+FROM "public.person";
+
+--Операторы для сравнения c NULL
+SELECT "name", "lastname"
+FROM "public.person"
+WHERE policyholder_id IS NOT NULL;
+
+--Функции для обработки NULL
+SELECT "city"
+ ,12*(bonus_amount + bonus_amount*COALESCE(100,-100))
+ AS "ANNUAL SALARY"
+FROM "public.Policy";
