@@ -1,0 +1,233 @@
+--Простой запрос
+SELECT "name", lastname
+FROM Agent;
+
+
+--Удаление дубликатов
+SELECT DISTINCT "name", lastname
+FROM Agent;
+
+
+--All Cols
+SELECT *
+FROM Agent;
+
+
+--All Cols and filter
+SELECT *
+FROM Agent agent
+WHERE agent.agent_id = 3;
+
+
+--Конкатенация (сцепление) строк. Псевдоним столбца
+SELECT
+"name" || ' ' || date_of_birth AS res
+FROM Agent;
+
+
+--Сравнение строки с шаблоном
+SELECT "name"
+FROM Agent agent
+WHERE agent.name LIKE '%a';
+
+
+--Проверка на попадание в диапазон
+SELECT date_of_birth
+FROM Agent agent
+WHERE agent.date_of_birth BETWEEN
+'1993-01-01' AND '2000-01-01';
+
+
+--Проверка на попадание в список значений
+SELECT *
+FROM Agent agent
+WHERE agent.agent_id IN (2,4);
+
+
+--Получение фиктивных значений
+SELECT 'one row' "name"
+
+
+--Получение ровно одного значения
+SELECT NOW();
+
+
+--Работа с неизвестными значениями
+SELECT 5 + NULL
+AS policyholder_id
+FROM person;
+
+
+--Операторы для сравнения c NULL
+SELECT name_person, lastname
+FROM person
+WHERE policyholder_id IS NOT NULL;
+
+
+--Функции для обработки NULL
+SELECT city
+ ,12*(bonus_amount + bonus_amount*COALESCE(100,-100))
+ AS "ANNUAL SALARY"
+FROM "Policy";
+SELECT *
+FROM "Policy"
+
+
+--Sort
+SELECT bonus_amount, insurance_amount
+FROM "Policy"
+ORDER BY bonus_amount DESC, 2 ASC;
+
+
+--ORDER BY и NULL
+SELECT bonus_amount
+FROM "Policy"
+ORDER BY bonus_amount NULLS FIRST;
+
+
+--Групповая функция
+SELECT COUNT(DISTINCT bonus_amount),
+MIN(city), MAX("date")
+FROM "Policy"
+WHERE policy_id IN (2,3,4,5);
+
+
+--Раздел GROUP BY. Пример
+SELECT agent_id, SUM(bonus_amount)
+FROM "Policy"
+GROUP BY agent_id;
+
+
+--Разделы GROUP BY и HAVING
+SELECT agent_id, SUM(bonus_amount)
+FROM "Policy"
+GROUP BY agent_id
+HAVING agent_id < 4;
+
+
+--Группировка по нескольким столбцам
+SELECT agent_id, "date",
+MAX(bonus_amount), MIN(insurance_amount)
+FROM "Policy"
+GROUP BY agent_id, "date";
+
+
+--HAVING. Пример
+SELECT agent_id, SUM(bonus_amount)
+FROM "Policy"
+GROUP BY agent_id
+HAVING SUM(bonus_amount) > 50000;
+
+
+--Пример левого внешнего соединения
+SELECT pol.agent_id, pol.insurance_amount, ag.name, ag.surname
+FROM "Policy" pol LEFT JOIN agent ag
+ON pol.agent_id = ag.agent_id;
+
+--Пример правого внешнего соединения
+SELECT pol.agent_id, pol.insurance_amount, ag.name, ag.surname
+FROM "Policy" pol RIGHT JOIN agent ag
+ON pol.agent_id = ag.agent_id;
+
+--Полное внешнее соединение
+SELECT pol.agent_id, pol.insurance_amount, ag.name, ag.surname
+FROM "Policy" pol FULL JOIN agent ag
+ON pol.agent_id = ag.agent_id;
+
+--декартово произведение
+SELECT pol.agent_id, pol.insurance_amount, ag.name, ag.surname
+FROM "Policy" pol CROSS JOIN agent ag
+
+
+--Пример многострочного подзапроса в разделе WHERE. Оператор ALL
+SELECT "name", surname
+FROM agent
+WHERE agent_id >= ALL
+(SELECT agent_id FROM agent);
+
+--Пример многострочного подзапроса в разделе WHERE. Оператор ANY
+SELECT  surname, expirience_work
+FROM agent
+WHERE agent_id >= ANY
+(SELECT agent_id FROM agent);
+
+
+--Пример подзапроса в разделе FROM
+SELECT  ag.surname, ag.expirience_work, pol.city
+FROM agent ag JOIN
+(SELECT agent_id, COUNT(*) city 
+FROM "Policy"
+GROUP BY agent_id) pol
+ON ag.agent_id = pol.agent_id;
+
+--Пример подзапроса в разделе SELECT
+SELECT lastname, expirience_work, (SELECT MAX(insurance_amount) FROM "Policy")
+FROM agent;
+
+
+--Пример подзапроса в команде UPDATE
+UPDATE "Policy"
+SET insurance_amount = (SELECT insurance_amount FROM "Policy" WHERE agent_id = 4)
+WHERE agent_id = 6;
+SELECT *
+FROM "Policy"
+
+
+--Пример подзапроса в команде DELETE
+DELETE FROM agent 
+WHERE agent_id IN (SELECT agent_id FROM agent
+			   WHERE agent_id IN (4,7))
+AND agent_id NOT IN (4,7);
+SELECT *
+FROM agent;
+
+
+
+--Пример коррелированного подзапроса
+SELECT agent_id, lastname
+FROM agent ag
+WHERE agent_id = (SELECT policy_id FROM "Policy" pol
+				 WHERE ag.agent_id = pol.agent_id);
+
+--Аналогичный запрос с использованием соединения таблиц
+SELECT ag.agent_id, ag.lastname
+FROM agent ag JOIN "Policy" pol
+ON(ag.agent_id = pol.agent_id)
+
+--Пример коррелированного запроса с оператором EXISTS
+SELECT ag_1.agent_id, ag_1.name
+FROM agent ag_1
+WHERE EXISTS		
+	(SELECT "name" FROM agent ag_2
+	 WHERE ag_1.agent_id =  ag_2.agent_id AND
+		  ag_1.name = ag_2.name);
+		
+			
+				
+--Решение ошибки с использованием оператора NOT EXISTS
+SELECT surname
+FROM agent ag
+WHERE NOT EXISTS
+(SELECT 'x' FROM "Policy" pol
+WHERE ag.agent_id = pol.agent_id);
+
+
+
+--Пример объединения. UNION
+SELECT policyholder FROM "Policy"
+WHERE agent_id = 5
+UNION
+SELECT policyholder FROM "Policy"
+WHERE agent_id = 6
+
+SELECT policyholder FROM "Policy"
+WHERE agent_id = 5
+UNION ALL
+SELECT policyholder FROM "Policy"
+WHERE agent_id = 8
+
+
+--Пример разности
+SELECT agent_id FROM agent
+MINUS
+SELECT agent_id FROM "Policy"
