@@ -1,0 +1,63 @@
+CREATE TABLE Student
+(
+	studentID INTEGER PRIMARY KEY,
+	Surname TEXT,
+	St_name TEXT,
+	Lastname TEXT,
+	Well INTEGER,
+	Squad_number INTEGER
+);
+
+CREATE TABLE Squad
+(
+	squadID INTEGER PRIMARY KEY REFERENCES Student(studentID) ON DELETE CASCADE,
+	Code INTEGER,
+	Squad_name TEXT,
+	University TEXT,
+	CHECK (University = 'SurGU' OR
+		   University = 'Yugra' OR
+		   University = 'TuMGU')
+);
+
+
+CREATE TABLE Work_Objects
+(
+	workObjID INTEGER PRIMARY KEY REFERENCES Squad (squadID) ON DELETE RESTRICT,
+	Date_Work DATE,
+	Name_Object TEXT,
+	Squad_number INTEGER,
+	Percentage_of_completion INTEGER,
+	 CHECK (Percentage_of_completion >= 0 AND
+		   			   Percentage_of_completion <= 100)
+);
+
+
+CREATE TABLE StudentSquad
+(
+	squadID INTEGER REFERENCES Squad (squadID),
+	studentID INTEGER REFERENCES Student (studentID),
+	workObjID INTEGER  REFERENCES Work_Objects (workObjID)
+);
+
+
+
+INSERT INTO Work_Objects
+VALUES (2, '1999-12-11', 'Stol', 2, 11),
+(3, '2000-03-12', 'Stul', 3, 21),
+(4, '1978-11-13', 'Amigo', 4, 31),
+(5, '2004-01-16', 'Room', 5, 31),
+(6, '2003-06-20', 'Doom', 6, 56),
+(7, '2004-08-26', 'Sensor', 7, 78),
+(8, '2005-09-24', 'Ice', 8, 99),
+(9, '2006-01-11', 'Cream', 9, 100),
+(10, '2007-03-01', 'Mivina', 10, 5)
+
+
+
+
+
+
+
+
+
+
